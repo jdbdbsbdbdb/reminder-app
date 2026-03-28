@@ -1,44 +1,33 @@
 name: Build Reminder App APK
-
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
-     - name: Setup project structure
+      - name: Setup project
         run: |
           mkdir -p gradle/wrapper
           curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
-          cp reminder-app/gradlew ./gradlew || true
-          cp reminder-app/build.gradle ./build.gradle || true
-          cp reminder-app/settings.gradle ./settings.gradle || true
-          cp reminder-app/gradle.properties ./gradle.properties || true
-          cp -r reminder-app/app ./app || true
-          cp reminder-app/gradle/wrapper/gradle-wrapper.properties gradle/wrapper/ || true
+          cp reminder-app/gradlew ./gradlew
+          cp reminder-app/build.gradle ./build.gradle
+          cp reminder-app/settings.gradle ./settings.gradle
+          cp -r reminder-app/app ./app
+          cp reminder-app/gradle/wrapper/gradle-wrapper.properties gradle/wrapper/
           chmod +x gradlew
-          echo "android.useAndroidX=true" >> gradle.properties
-          echo "android.enableJetifier=true" >> gradle.properties
-          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
-
+          printf 'android.useAndroidX=true\nandroid.enableJetifier=true\norg.gradle.jvmargs=-Xmx2048m\n' > gradle.properties
       - uses: android-actions/setup-android@v3
-
       - name: Install SDK
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
-
       - name: Build APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
-
       - uses: actions/upload-artifact@v4
         with:
           name: reminder-apk
