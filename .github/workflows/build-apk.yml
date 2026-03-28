@@ -16,16 +16,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup project structure
+     - name: Setup project structure
         run: |
           mkdir -p gradle/wrapper
           curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
           cp reminder-app/gradlew ./gradlew || true
           cp reminder-app/build.gradle ./build.gradle || true
           cp reminder-app/settings.gradle ./settings.gradle || true
+          cp reminder-app/gradle.properties ./gradle.properties || true
           cp -r reminder-app/app ./app || true
           cp reminder-app/gradle/wrapper/gradle-wrapper.properties gradle/wrapper/ || true
           chmod +x gradlew
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
+          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
 
       - uses: android-actions/setup-android@v3
 
